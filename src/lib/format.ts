@@ -1,5 +1,14 @@
 // Utilidades de presentación.
 
+// Nombre para mostrar de jinete/entrenador: prefiere el nombreCorto con
+// acentos (del scraper) y cae al formateo del nombre oficial INH.
+export function displayPersona(
+  p: { nombre: string; nombreCorto?: string | null } | null | undefined,
+): string {
+  if (!p) return "—";
+  return p.nombreCorto ?? nombrePersona(p.nombre);
+}
+
 // "VELASQUEZ F FRANKLIN R" (formato INH: APELLIDO [inicial] NOMBRE [inicial])
 // → "Franklin Velasquez". Los tokens de una sola letra son iniciales.
 export function nombrePersona(oficial: string | null | undefined): string {

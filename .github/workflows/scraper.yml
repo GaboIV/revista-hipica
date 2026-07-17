@@ -1,0 +1,59 @@
+# Scraper semanal de la programación hípica.
+#
+# - Martes 6:00 pm (hora Venezuela, UTC-4 → 22:00 UTC): corrida principal
+#   (las inscripciones se publican los martes).
+# - Miércoles 6:00 pm: reintento; si aún no hay datos de la próxima reunión
+#   (o el scraper falla), envía un correo de aviso (--notify).
+#
+# Secrets requeridos (repo → Settings → Secrets and variables → Actions):
+#   DATABASE_URL, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, MAIL_FROM, MAIL_TO
+name: Scraper semanal
+
+on:
+  schedule:
+    - cron: "0 22 * * 2" # martes 6pm VET
+    - cron: "0 22 * * 3" # miércoles 6pm VET (reintento + aviso)
+  workflow_dispatch:
+    inputs:
+      notify:
+        description: "Enviar correo si no hay datos nuevos"
+        type: boolean
+        default: false
+      fecha:
+        description: "Fecha específica (YYYY-MM-DD, opcional)"
+        required: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar scraper
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: |
+          ARGS=""
+          # El miércoles (o si se pide manualmente) va con --notify
+          if [ "${{ github.event.schedule }}" = "0 22 * * 3" ] || [ "${{ inputs.notify }}" = "true" ]; then
+            ARGS="$ARGS --notify"
+          fi
+          if [ -n "${{ inputs.fecha }}" ]; then
+            ARGS="$ARGS --fecha ${{ inputs.fecha }}"
+          fi
+          npx tsx scripts/scrape-jockey.ts $ARGS

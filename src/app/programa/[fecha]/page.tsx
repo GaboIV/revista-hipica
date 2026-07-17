@@ -11,7 +11,7 @@ import {
   horaCorta,
   nombreCortoCarrera,
   nombreEjemplar,
-  nombrePersona,
+  displayPersona,
 } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -240,14 +240,14 @@ function TabInscritos({ reunion, fecha }: { reunion: ReunionCompleta; fecha: str
                       </span>
                     )}
                     <p className="text-xs text-muted md:hidden">
-                      {nombrePersona(i.jinete?.nombre)}
+                      {displayPersona(i.jinete)}
                     </p>
                   </td>
                   <td className="hidden px-2 py-2 md:table-cell">
-                    {nombrePersona(i.jinete?.nombre)}
+                    {displayPersona(i.jinete)}
                   </td>
                   <td className="hidden px-2 py-2 text-muted lg:table-cell">
-                    {nombrePersona(i.entrenador?.nombre)}
+                    {displayPersona(i.entrenador)}
                   </td>
                   <td className="py-2 pl-2 pr-4 text-right font-medium">
                     {i.kilos ? Number(i.kilos) : "—"}
@@ -275,7 +275,7 @@ function TabCompromisos({ reunion }: { reunion: ReunionCompleta }) {
     for (const i of c.inscripciones) {
       if (i.jinete) {
         const j = porJinete.get(i.jinete.nombre) ?? {
-          nombre: i.jinete.nombre,
+          nombre: displayPersona(i.jinete),
           carreras: [],
         };
         j.carreras.push(c.nroCarrera);
@@ -283,7 +283,7 @@ function TabCompromisos({ reunion }: { reunion: ReunionCompleta }) {
       }
       if (i.entrenador) {
         const e = porEntrenador.get(i.entrenador.nombre) ?? {
-          nombre: i.entrenador.nombre,
+          nombre: displayPersona(i.entrenador),
           carreras: [],
         };
         e.carreras.push(c.nroCarrera);
@@ -331,7 +331,7 @@ function ListaCompromisos({
         {items.map((p) => (
           <li key={p.nombre} className="flex items-center gap-3 px-4 py-2.5">
             <span className="w-44 shrink-0 truncate text-sm font-semibold sm:w-52">
-              {nombrePersona(p.nombre)}
+              {p.nombre}
             </span>
             <span className="shrink-0 rounded-full bg-vino px-2 py-0.5 text-xs font-bold text-white">
               {p.carreras.length}

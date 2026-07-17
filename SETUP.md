@@ -83,11 +83,35 @@ npx prisma db seed
 
 ---
 
-## 5. Cron del scraper (Fase 2, referencia futura)
+## 5. Cron del scraper (activo desde Fase 2)
 
-El scraper correrá como GitHub Action programada (lunes 6pm hora Venezuela,
-reintento martes). Necesitará el secret `DATABASE_URL` en:
-repo → Settings → Secrets and variables → Actions.
+`.github/workflows/scraper.yml` corre el scraper los **martes 6pm** (hora
+Venezuela; las inscripciones se publican los martes) y reintenta los
+**miércoles 6pm** con aviso por correo si sigue sin haber datos.
+
+Para que funcione, agrega estos secrets en
+repo → Settings → Secrets and variables → Actions:
+
+| Secret | Valor |
+|---|---|
+| `DATABASE_URL` | Connection string de Neon (producción) |
+| `SMTP_HOST` | `smtp.gmail.com` (si usas Gmail) |
+| `SMTP_PORT` | `465` |
+| `SMTP_USER` | tu cuenta Gmail |
+| `SMTP_PASS` | contraseña de aplicación (16 letras — requiere verificación en 2 pasos, se crea en https://myaccount.google.com/apppasswords) |
+| `MAIL_FROM` | `Revista Hípica <tucuenta@gmail.com>` |
+| `MAIL_TO` | `gabrielcaraballo1907@gmail.com` |
+
+También puedes dispararlo a mano: pestaña **Actions → Scraper semanal →
+Run workflow** (con opción de fecha específica y de aviso por correo).
+
+Comandos locales equivalentes:
+
+```bash
+npx tsx scripts/scrape-jockey.ts                    # todas las fechas publicadas
+npx tsx scripts/scrape-jockey.ts --fecha 2026-07-19 # una fecha
+npx tsx scripts/import-inh-xlsx.ts dataScrapping/repProgramacion28.xlsx
+```
 
 ---
 

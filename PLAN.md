@@ -139,11 +139,19 @@ detalle de carrera con retrospecto por ejemplar (vacío hasta Fase 2). Identidad
 vinotinto/dorado + Playfair Display, dark mode, gualdrapas de colores, slots de publicidad.
 El tab Favoritos se sustituirá por la cátedra propia cuando exista.
 
-### Fase 2 — Ingesta de datos (2–3 sesiones)
-1. `import-inh-xlsx.ts`: sube el Excel oficial → crea Reunión/Carreras/Inscripciones.
-2. `scrape-jockey.ts`: programación, retrospectos (esto puebla `Actuacion` con ~6 actuaciones
-   históricas por ejemplar — arranque del histórico), estadísticas anuales.
-3. Cron de GitHub Actions (lunes/martes) + botón manual en admin.
+### Fase 2 — Ingesta de datos ✅ (completada 17-jul-2026)
+1. `scripts/import-inh-xlsx.ts`: importa el Excel oficial del INH (fuente de verdad para
+   inscripciones: jinete, kilos, medicación, implementos, premios).
+2. `scripts/scrape-jockey.ts`: scrapea jockeypronosticos — programación, pedigrí, studs,
+   retirados (con motivo), y el retrospecto completo → tabla `Actuacion` (921 actuaciones
+   en la primera corrida). Matching de nombres INH↔web con desambiguación por iniciales;
+   los nombres display (con acentos) se guardan en `nombreCorto`. Idempotente.
+   Pronósticos de terceros NO se scrapean (cátedra propia).
+3. Cron GitHub Actions (`.github/workflows/scraper.yml`): martes 6pm VET (publicación de
+   inscripciones) + miércoles 6pm VET de reintento con `--notify` — si tras el miércoles
+   no hay reunión próxima con inscritos (o el scraper falla), avisa por correo a
+   gabrielcaraballo1907@gmail.com vía SMTP (nodemailer).
+   Pendiente de Fase 3: scrapear estadísticas anuales 2023+.
 
 ### Fase 3 — Estadísticas y fichas (1–2 sesiones)
 Página de estadísticas anuales (jinetes/entrenadores, 2023+ scrapeado), fichas de

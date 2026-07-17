@@ -11,7 +11,7 @@ import {
   horaCorta,
   nombreCortoCarrera,
   nombreEjemplar,
-  nombrePersona,
+  displayPersona,
 } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -181,12 +181,12 @@ export default async function CarreraPage({ params }: { params: Promise<Params> 
                 <dl className="ml-auto grid grid-cols-2 gap-x-6 gap-y-1 text-xs sm:grid-cols-4">
                   <div>
                     <dt className="text-muted">Jinete</dt>
-                    <dd className="font-semibold">{nombrePersona(i.jinete?.nombre)}</dd>
+                    <dd className="font-semibold">{displayPersona(i.jinete)}</dd>
                   </div>
                   <div>
                     <dt className="text-muted">Entrenador</dt>
                     <dd className="font-semibold">
-                      {nombrePersona(i.entrenador?.nombre)}
+                      {displayPersona(i.entrenador)}
                     </dd>
                   </div>
                   <div>
@@ -250,7 +250,7 @@ export default async function CarreraPage({ params }: { params: Promise<Params> 
                             {a.posFinal ?? "—"}
                             {a.nroInscritos ? `/${a.nroInscritos}` : ""}
                           </td>
-                          <td className="px-2 py-1.5">{nombrePersona(a.jinete?.nombre)}</td>
+                          <td className="px-2 py-1.5">{displayPersona(a.jinete)}</td>
                           <td className="px-2 py-1.5">{a.kilos ? Number(a.kilos) : "—"}</td>
                           <td className="py-1.5 pl-2 pr-4 text-muted">
                             {[a.ganador, a.segundo, a.tercero]

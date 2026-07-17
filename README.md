@@ -32,6 +32,8 @@ Comandos útiles:
 | `npm run db:seed` | Vuelve a ejecutar el seed (es idempotente) |
 | `npm run db:studio` | Explorador visual de la base de datos |
 | `npm run build` | Build de producción |
+| `npx tsx scripts/scrape-jockey.ts` | Scraper de programación y retrospectos |
+| `npx tsx scripts/import-inh-xlsx.ts <archivo.xlsx>` | Importa el Excel oficial del INH |
 
 ## Estructura
 
@@ -57,5 +59,6 @@ webEjemplo/         Capturas y PDFs de la web de referencia (solo consulta)
 
 - ✅ Fase 0 — Fundación: scaffold, esquema BD, seed real, build verde.
 - ✅ Fase 1 — MVP visual: portada, programa con tabs, detalle de carrera.
-- ⬜ Fase 2 — Ingesta (importador Excel INH + scraper + cron).
+- ✅ Fase 2 — Ingesta: importador Excel INH, scraper con retrospectos
+  (tabla `Actuacion`), cron martes/miércoles con aviso por correo.
 - ⬜ Fase 3 — Estadísticas y fichas. ⬜ Fase 4 — Admin. ⬜ Fase 5 — Deploy.

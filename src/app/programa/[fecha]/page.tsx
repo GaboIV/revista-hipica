@@ -39,7 +39,12 @@ async function cargarReunion(fecha: string) {
         include: {
           inscripciones: {
             orderBy: { nroPuesto: "asc" },
-            include: { ejemplar: true, jinete: true, entrenador: true },
+            include: {
+              ejemplar: true,
+              jinete: true,
+              entrenador: true,
+              resultado: true,
+            },
           },
         },
       },
@@ -66,11 +71,25 @@ export default async function ProgramaPage({
     0,
   );
 
-  const tabs = [
+  // Contar carreras con resultados
+  const carrerasConResultados = reunion.carreras.filter((c) =>
+    c.inscripciones.some((i) => i.resultado),
+  ).length;
+
+  const tabs: { id: string; label: string; badge: number | null }[] = [
     { id: "carreras", label: "Carreras", badge: reunion.carreras.length },
     { id: "inscritos", label: "Inscritos", badge: totalInscritos },
     { id: "compromisos", label: "Compromisos", badge: null },
-  ] as const;
+  ];
+
+  // Solo mostrar tab de resultados si hay al menos un resultado cargado
+  if (carrerasConResultados > 0) {
+    tabs.push({
+      id: "resultados",
+      label: "Resultados",
+      badge: carrerasConResultados,
+    });
+  }
 
   return (
     <main>
@@ -125,6 +144,7 @@ export default async function ProgramaPage({
         {tab === "carreras" && <TabCarreras reunion={reunion} fecha={fecha} />}
         {tab === "inscritos" && <TabInscritos reunion={reunion} fecha={fecha} />}
         {tab === "compromisos" && <TabCompromisos reunion={reunion} />}
+        {tab === "resultados" && <TabResultados reunion={reunion} fecha={fecha} />}
         <div className="mt-10">
           <AdSlot format="banner" />
         </div>
@@ -141,6 +161,7 @@ function TabCarreras({ reunion, fecha }: { reunion: ReunionCompleta; fecha: stri
       <ul className="divide-y divide-borde">
         {reunion.carreras.map((c) => {
           const esClasico = Boolean(c.nombreClasico);
+          const tieneResultados = c.inscripciones.some((i) => i.resultado);
           return (
             <li key={c.id} className={esClasico ? "bg-oro-soft/60" : undefined}>
               <Link
@@ -160,6 +181,11 @@ function TabCarreras({ reunion, fecha }: { reunion: ReunionCompleta; fecha: stri
                     {c.grado && (
                       <span className="ml-2 rounded bg-oro px-1.5 py-0.5 text-xs font-bold text-white">
                         {c.grado}
+                      </span>
+                    )}
+                    {tieneResultados && (
+                      <span className="ml-2 rounded bg-green-100 px-1.5 py-0.5 text-xs font-bold text-green-700 dark:bg-green-950/50 dark:text-green-400">
+                        ✓
                       </span>
                     )}
                   </p>
@@ -351,5 +377,105 @@ function ListaCompromisos({
         ))}
       </ul>
     </section>
+  );
+}
+
+/* ── Tab: Resultados ───────────────────────────────────────────── */
+
+function TabResultados({ reunion, fecha }: { reunion: ReunionCompleta; fecha: string }) {
+  return (
+    <div className="space-y-4">
+      {reunion.carreras.map((c) => {
+        const inscrConRes = c.inscripciones
+          .filter((i) => i.resultado && i.resultado.posicion > 0)
+          .sort((a, b) => a.resultado!.posicion - b.resultado!.posicion);
+
+        const tieneResultados = inscrConRes.length > 0;
+        const tiempoGanador = inscrConRes[0]?.resultado?.tiempoGanador;
+
+        return (
+          <Link
+            key={c.id}
+            href={`/carrera/${fecha}/${c.nroCarrera}`}
+            className="group block overflow-hidden rounded-xl border border-borde bg-surface shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            {/* Cabecera */}
+            <div className="flex items-center gap-3 border-b border-borde bg-surface-2/60 px-4 py-3">
+              <span
+                className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold ${
+                  c.nombreClasico ? "bg-oro text-white" : "bg-vino text-white"
+                }`}
+              >
+                {c.nroCarrera}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-semibold">
+                  {nombreCortoCarrera(c.condicion, c.nombreClasico)}
+                  {c.grado && (
+                    <span className="ml-2 rounded bg-oro px-1.5 py-0.5 text-xs font-bold text-white">
+                      {c.grado}
+                    </span>
+                  )}
+                </p>
+                <p className="text-xs text-muted">
+                  {c.distancia}m
+                  {tiempoGanador && (
+                    <span className="ml-2 font-semibold text-foreground">
+                      T: {tiempoGanador}
+                    </span>
+                  )}
+                </p>
+              </div>
+              <span className="text-sm font-medium text-vino opacity-0 transition group-hover:opacity-100">
+                Detalle ›
+              </span>
+            </div>
+
+            {/* Podio */}
+            {tieneResultados ? (
+              <div className="divide-y divide-borde/40">
+                {inscrConRes.slice(0, 5).map((i) => {
+                  const pos = i.resultado!.posicion;
+                  const esGanador = pos === 1;
+                  return (
+                    <div
+                      key={i.id}
+                      className={`flex items-center gap-3 px-4 py-2.5 ${
+                        esGanador ? "bg-oro-soft/60" : ""
+                      }`}
+                    >
+                      <span
+                        className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
+                          pos === 1
+                            ? "bg-oro text-white"
+                            : pos === 2
+                              ? "bg-gray-300 text-gray-800 dark:bg-gray-600 dark:text-gray-200"
+                              : pos === 3
+                                ? "bg-orange-300 text-orange-900 dark:bg-orange-700 dark:text-orange-100"
+                                : "bg-surface-2 text-muted"
+                        }`}
+                      >
+                        {pos}°
+                      </span>
+                      <Gualdrapa n={i.nroPuesto} />
+                      <span className={`font-semibold ${esGanador ? "text-base" : "text-sm"}`}>
+                        {nombreEjemplar(i.ejemplar.nombre)}
+                      </span>
+                      <span className="ml-auto text-xs text-muted">
+                        {displayPersona(i.jinete)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="px-4 py-4 text-center text-sm text-muted">
+                Resultados pendientes
+              </p>
+            )}
+          </Link>
+        );
+      })}
+    </div>
   );
 }

@@ -54,6 +54,8 @@ model Carrera {
   premioUsd     Decimal? @db.Decimal(14, 2)
   record        String? // récord de la distancia, ej. "1:14 3/5"
   inscripciones Inscripcion[]
+  resultados    Resultado[]
+  actuaciones   Actuacion[]
   pronosticos   Pronostico[]
 
   @@unique([reunionId, nroCarrera])
@@ -119,6 +121,7 @@ model Inscripcion {
   implementos  String? // "L.V.GR.BB.M.LA."
   precioUsd    Decimal?   @db.Decimal(12, 2) // precio de reclamo
   retirado     Boolean    @default(false)
+  resultado    Resultado?
 
   @@unique([carreraId, nroPuesto])
 }
@@ -133,6 +136,8 @@ model Actuacion {
   ejemplarId   Int
   jinete       Jinete?  @relation(fields: [jineteId], references: [id])
   jineteId     Int?
+  carrera      Carrera? @relation(fields: [carreraId], references: [id])
+  carreraId    Int?
   fecha        DateTime @db.Date
   hipodromo    String   @default("La Rinconada")
   distancia    Int?
@@ -155,7 +160,26 @@ model Actuacion {
   fuente       String? // "jockeypronosticos" | "inh" | "manual"
   raw          Json? // fila original para re-procesar sin re-scrapear
 
-  @@unique([ejemplarId, fecha])
+  @@unique([ejemplarId, fecha, carreraId])
+}
+
+// ── Resultados de carrera ───────────────────────────────────────────
+// Cada posición de llegada de una carrera corrida. Fuente de verdad
+// para estadísticas; al guardar resultados se generan Actuaciones.
+
+model Resultado {
+  id             Int         @id @default(autoincrement())
+  carrera        Carrera     @relation(fields: [carreraId], references: [id])
+  carreraId      Int
+  inscripcion    Inscripcion @relation(fields: [inscripcionId], references: [id])
+  inscripcionId  Int         @unique // 1 resultado por inscripción
+  posicion       Int         // 1, 2, 3... (0 = NP / no participó)
+  tiempoGanador  String?     // "1:14 3/5" — se guarda para referencia
+  cuerpos        String?     // distancia al ganador (futuro)
+  dividendo      String?     // cotización del ejemplar (futuro)
+  creadoEn       DateTime    @default(now())
+
+  @@unique([carreraId, posicion]) // no pueden haber dos primeros
 }
 
 // ── Cátedra propia ──────────────────────────────────────────────────

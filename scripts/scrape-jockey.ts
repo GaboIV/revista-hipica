@@ -248,8 +248,8 @@ async function procesarCaballo(
 
   // Retrospecto → tabla Actuacion (el histórico propio)
   for (const a of c.actuaciones) {
-    const ya = await prisma.actuacion.findUnique({
-      where: { ejemplarId_fecha: { ejemplarId: ejemplar.id, fecha: new Date(a.fecha) } },
+    const ya = await prisma.actuacion.findFirst({
+      where: { ejemplarId: ejemplar.id, fecha: new Date(a.fecha), carreraId: null },
     });
     if (ya) continue;
     const jineteAct = await matchJinetes.resolver(a.jinete);

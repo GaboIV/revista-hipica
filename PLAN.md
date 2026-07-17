@@ -153,12 +153,21 @@ El tab Favoritos se sustituirá por la cátedra propia cuando exista.
    gabrielcaraballo1907@gmail.com vía SMTP (nodemailer).
    Pendiente de Fase 3: scrapear estadísticas anuales 2023+.
 
-### Fase 3 — Estadísticas y fichas (1–2 sesiones)
-Página de estadísticas anuales (jinetes/entrenadores, 2023+ scrapeado), fichas de
-caballo/jinete/entrenador alimentadas por `Actuacion`.
+### Fase 3 — Resultados, estadísticas y panel admin ✅ (completada 17-jul-2026)
+Modelo `Resultado` vinculado a `Carrera` + `Inscripcion`. Panel admin (`/admin`) con
+autenticación por cookie (`ADMIN_SECRET`): dashboard de reuniones, carga manual de
+resultados por carrera (posiciones + tiempo del ganador), generación automática de
+`Actuacion` al guardar resultados, marcado de reunión como `CORRIDA`. Vista pública:
+tab "Resultados" en programa del día con resumen podio, banner de podio en detalle de
+carrera con posiciones de llegada ordenadas, badges de posición (oro/plata/bronce).
+Página de estadísticas anuales (`/estadisticas/[year]`) calculadas en tiempo real:
+jinetes, entrenadores y ejemplares con victorias, 2dos, 3ros, montas, % efectividad.
+Pendiente para futuro: fichas individuales de caballo/jinete/entrenador, scraping de
+estadísticas históricas 2023+, cuerpos/dividendos en resultados.
 
-### Fase 4 — Panel admin (1–2 sesiones)
-Login admin, subir Excel/PDF, disparar scraper, marcar retirados, editar datos, log de importaciones.
+### Fase 4 — Panel admin avanzado (1–2 sesiones)
+Auth.js con credencial, subir Excel/PDF, disparar scraper, marcar retirados, editar
+datos, log de importaciones. (El admin básico ya existe desde Fase 3.)
 
 ### Fase 5 — Deploy y dominio
 Vercel + Neon, dominio propio, Analytics, sitemap/SEO (metadatos por carrera y fecha — clave

@@ -48,9 +48,22 @@ export async function generateMetadata({
   const totalCarreras = reunion.carreras.length;
   const totalInscritos = reunion.carreras.reduce((acc, c) => acc + c.inscripciones.length, 0);
 
+  const title = `Programa Oficial · Reunión ${reunion.nroReunion} (${fLarga}) — ${reunion.hipodromo.nombre}`;
+  const description = `Programación oficial para la Reunión ${reunion.nroReunion} en ${reunion.hipodromo.nombre} (${fLarga}). Consulta las ${totalCarreras} carreras, ${totalInscritos} ejemplares inscritos, retrospectos de actuaciones, compromisos y resultados.`;
+
   return {
-    title: `Programa Oficial · Reunión ${reunion.nroReunion} (${fLarga}) — ${reunion.hipodromo.nombre}`,
-    description: `Programación oficial para la Reunión ${reunion.nroReunion} en ${reunion.hipodromo.nombre} (${fLarga}). Consulta las ${totalCarreras} carreras, ${totalInscritos} ejemplares inscritos, retrospectos de actuaciones, compromisos y resultados.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 

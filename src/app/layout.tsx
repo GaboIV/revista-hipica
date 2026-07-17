@@ -26,6 +26,18 @@ export const metadata: Metadata = {
   },
   description:
     "Programación, retrospectos y estadísticas del hipismo venezolano — Hipódromo La Rinconada",
+  openGraph: {
+    title: "Revista Hípica de Venezuela",
+    description: "Programación oficial, retrospectos de actuaciones y estadísticas en tiempo real del hipismo venezolano — Hipódromo La Rinconada.",
+    type: "website",
+    locale: "es_VE",
+    siteName: "Revista Hípica",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Revista Hípica de Venezuela",
+    description: "Programación oficial, retrospectos de actuaciones y estadísticas en tiempo real del hipismo venezolano — Hipódromo La Rinconada.",
+  },
 };
 
 export default function RootLayout({

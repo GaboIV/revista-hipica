@@ -54,9 +54,22 @@ export async function generateMetadata({
   const clasico = carrera.nombreClasico ? ` · ${carrera.nombreClasico}` : "";
   const inscritos = carrera.inscripciones.map((i) => nombreEjemplar(i.ejemplar.nombre)).join(", ");
 
+  const title = `Carrera ${carrera.nroCarrera} · ${nShort} (${carrera.distancia}m) · ${fLarga} — ${reunion.hipodromo.nombre}`;
+  const description = `Detalles e inscritos de la Carrera ${carrera.nroCarrera}${clasico} del ${fLarga} en ${reunion.hipodromo.nombre}. Distancia: ${carrera.distancia}m, superficie: ${carrera.superficie}. Ejemplares: ${inscritos.slice(0, 160)}... Consulta retrospectos completos.`;
+
   return {
-    title: `Carrera ${carrera.nroCarrera} · ${nShort} (${carrera.distancia}m) · ${fLarga} — ${reunion.hipodromo.nombre}`,
-    description: `Detalles e inscritos de la Carrera ${carrera.nroCarrera}${clasico} del ${fLarga} en ${reunion.hipodromo.nombre}. Distancia: ${carrera.distancia}m, superficie: ${carrera.superficie}. Ejemplares: ${inscritos.slice(0, 160)}... Consulta retrospectos completos.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 

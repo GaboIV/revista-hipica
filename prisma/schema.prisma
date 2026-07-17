@@ -1,0 +1,189 @@
+// Esquema de datos — Revista Hípica Digital de Venezuela
+// Ver PLAN.md §4 para el razonamiento del modelo.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Núcleo ──────────────────────────────────────────────────────────
+
+model Hipodromo {
+  id        Int       @id @default(autoincrement())
+  nombre    String    @unique // "La Rinconada"
+  ciudad    String?
+  reuniones Reunion[]
+}
+
+model Reunion {
+  id          Int       @id @default(autoincrement())
+  hipodromo   Hipodromo @relation(fields: [hipodromoId], references: [id])
+  hipodromoId Int
+  fecha       DateTime  @db.Date
+  nroReunion  Int? // "Reunión 28" del INH
+  estado      EstadoReunion @default(PROGRAMADA)
+  carreras    Carrera[]
+
+  @@unique([hipodromoId, fecha])
+}
+
+enum EstadoReunion {
+  PROGRAMADA
+  CORRIDA
+  SUSPENDIDA
+}
+
+model Carrera {
+  id            Int      @id @default(autoincrement())
+  reunion       Reunion  @relation(fields: [reunionId], references: [id])
+  reunionId     Int
+  nroCarrera    Int // 1..15 dentro de la reunión
+  nroLlamado    Int? // "Llamado" del INH
+  nroAnual      Int? // "Carrera Anual Nro." del INH
+  hora          String? // "01:00 PM" hora local Venezuela
+  distancia     Int // metros
+  superficie    String  @default("Arena")
+  condicion     String? // texto completo de condiciones
+  nombreClasico String? // "Clásico Prensa Hípica Nacional"
+  grado         String? // "G1"
+  premioBs      Decimal? @db.Decimal(14, 2)
+  premioUsd     Decimal? @db.Decimal(14, 2)
+  record        String? // récord de la distancia, ej. "1:14 3/5"
+  inscripciones Inscripcion[]
+  pronosticos   Pronostico[]
+
+  @@unique([reunionId, nroCarrera])
+}
+
+// ── Actores ─────────────────────────────────────────────────────────
+
+model Ejemplar {
+  id            Int     @id @default(autoincrement())
+  nombre        String  @unique
+  slug          String  @unique
+  sexo          String? // M / H (macho/hembra); "M.C." = macho castrado
+  padre         String?
+  madre         String?
+  abueloMaterno String?
+  inscripciones Inscripcion[]
+  actuaciones   Actuacion[]
+}
+
+model Jinete {
+  id            Int     @id @default(autoincrement())
+  nombre        String  @unique // nombre oficial INH, ej. "VELASQUEZ F FRANKLIN R"
+  nombreCorto   String? // para mostrar, ej. "Franklin Velásquez"
+  slug          String  @unique
+  inscripciones Inscripcion[]
+  actuaciones   Actuacion[]
+}
+
+model Entrenador {
+  id            Int     @id @default(autoincrement())
+  nombre        String  @unique
+  nombreCorto   String?
+  slug          String  @unique
+  inscripciones Inscripcion[]
+}
+
+model Stud {
+  id            Int     @id @default(autoincrement())
+  nombre        String  @unique
+  inscripciones Inscripcion[]
+}
+
+// ── Inscripciones (programación) ────────────────────────────────────
+
+model Inscripcion {
+  id           Int        @id @default(autoincrement())
+  carrera      Carrera    @relation(fields: [carreraId], references: [id])
+  carreraId    Int
+  ejemplar     Ejemplar   @relation(fields: [ejemplarId], references: [id])
+  ejemplarId   Int
+  jinete       Jinete?    @relation(fields: [jineteId], references: [id])
+  jineteId     Int?
+  entrenador   Entrenador? @relation(fields: [entrenadorId], references: [id])
+  entrenadorId Int?
+  stud         Stud?      @relation(fields: [studId], references: [id])
+  studId       Int?
+  nroPuesto    Int // número del ejemplar en la carrera (gualdrapa)
+  pp           Int? // puesto de partida
+  kilos        Decimal?   @db.Decimal(4, 1)
+  descargo     Int? // kg de descargo por jinete aprendiz ("57-3" en el INH)
+  edad         Int? // edad del ejemplar al momento de la carrera
+  medicacion   String? // "BUT-LAX"
+  implementos  String? // "L.V.GR.BB.M.LA."
+  precioUsd    Decimal?   @db.Decimal(12, 2) // precio de reclamo
+  retirado     Boolean    @default(false)
+
+  @@unique([carreraId, nroPuesto])
+}
+
+// ── Histórico (retrospecto) ─────────────────────────────────────────
+// Cada actuación pasada de un ejemplar. Esta tabla acumula el
+// histórico propio: crece con cada resultado importado o scrapeado.
+
+model Actuacion {
+  id           Int      @id @default(autoincrement())
+  ejemplar     Ejemplar @relation(fields: [ejemplarId], references: [id])
+  ejemplarId   Int
+  jinete       Jinete?  @relation(fields: [jineteId], references: [id])
+  jineteId     Int?
+  fecha        DateTime @db.Date
+  hipodromo    String   @default("La Rinconada")
+  distancia    Int?
+  pesoCorporal Int? // peso físico del ejemplar (PF)
+  parciales    String? // "25 2/5 48 4/5 73 (6 2/5)"
+  tiempo       String? // "82 4/5"
+  lote         String? // condición/lote de esa carrera
+  sr           Int? // speed rating
+  pp           Int?
+  pasos        String? // "2-3"
+  posFinal     Int?
+  nroInscritos Int? // posFinal/nroInscritos, ej. 6/11
+  cuerpos      String? // "16 1/2"
+  kilos        Decimal? @db.Decimal(4, 1)
+  dividendo    String? // cotización
+  ganador      String?
+  segundo      String?
+  tercero      String?
+  videoUrl     String?
+  fuente       String? // "jockeypronosticos" | "inh" | "manual"
+  raw          Json? // fila original para re-procesar sin re-scrapear
+
+  @@unique([ejemplarId, fecha])
+}
+
+// ── Cátedra propia ──────────────────────────────────────────────────
+// Solo pronósticos propios; no se publican pronósticos de terceros.
+
+model Pronostico {
+  id          Int     @id @default(autoincrement())
+  carrera     Carrera @relation(fields: [carreraId], references: [id])
+  carreraId   Int
+  fuente      String  @default("propia")
+  seleccion1  Int? // nroPuesto del ejemplar
+  seleccion2  Int?
+  seleccion3  Int?
+  comentario  String?
+
+  @@unique([carreraId, fuente])
+}
+
+// ── Revista (fase futura, tabla prevista desde ya) ──────────────────
+
+model Articulo {
+  id          Int       @id @default(autoincrement())
+  titulo      String
+  slug        String    @unique
+  resumen     String?
+  cuerpo      String // markdown
+  autor       String?
+  portadaUrl  String?
+  publicadoEn DateTime?
+  creadoEn    DateTime  @default(now())
+}

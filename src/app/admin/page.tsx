@@ -3,7 +3,9 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { fechaLarga, fechaISO } from "@/lib/format";
 
-export const metadata = { title: "Admin — Reuniones" };
+import { IngestaPanel } from "./ingesta-panel";
+
+export const metadata = { title: "Admin — Panel de Control" };
 
 export default async function AdminPage() {
   const reuniones = await prisma.reunion.findMany({
@@ -20,11 +22,23 @@ export default async function AdminPage() {
   });
 
   return (
-    <>
-      <h1 className="font-display text-2xl font-bold">Reuniones</h1>
-      <p className="mt-1 text-sm text-muted">
-        Selecciona una reunión para cargar resultados.
-      </p>
+    <div className="space-y-10">
+      {/* Sección Ingesta */}
+      <section className="space-y-4">
+        <h1 className="font-display text-2xl font-bold">Ingesta de Datos</h1>
+        <IngestaPanel />
+      </section>
+
+      <hr className="border-borde" />
+
+      {/* Sección Reuniones */}
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-display text-2xl font-bold">Reuniones cargadas</h2>
+          <p className="mt-1 text-sm text-muted">
+            Selecciona una reunión para cargar resultados o gestionar retirados.
+          </p>
+        </div>
 
       <div className="mt-6 space-y-3">
         {reuniones.map((r) => {
@@ -83,6 +97,7 @@ export default async function AdminPage() {
           </p>
         )}
       </div>
-    </>
+    </section>
+  </div>
   );
 }

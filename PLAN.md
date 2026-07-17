@@ -165,9 +165,12 @@ jinetes, entrenadores y ejemplares con victorias, 2dos, 3ros, montas, % efectivi
 Pendiente para futuro: fichas individuales de caballo/jinete/entrenador, scraping de
 estadísticas históricas 2023+, cuerpos/dividendos en resultados.
 
-### Fase 4 — Panel admin avanzado (1–2 sesiones)
-Auth.js con credencial, subir Excel/PDF, disparar scraper, marcar retirados, editar
-datos, log de importaciones. (El admin básico ya existe desde Fase 3.)
+### Fase 4 — Panel admin avanzado ✅ (completada 17-jul-2026)
+- **Refactorización del Núcleo**: Lógica de importación de Excel (`import-inh.ts`) y scraping (`scrape-jockey.ts`) movida a `src/lib/` para su reutilización tanto en CLI como en la Web.
+- **Herramientas de Ingesta en la Interfaz**: Sección de subida del Excel oficial del INH mediante FormData y botón de "Sincronizar Datos Web" con JockeyPronosticos.
+- **API del Admin**: Creación de los endpoints `/api/admin/importar-excel` y `/api/admin/correr-scraper`.
+- **Gestión de Retirados Interactiva**: Componente `CarreraAdminCard` y endpoint `/api/admin/inscripcion/[id]/retirar` que permiten marcar/desmarcar ejemplares como retirados dinámicamente con actualización instantánea de la base de datos y limpieza de resultados/actuaciones obsoletas.
+
 
 ### Fase 5 — Deploy y dominio
 Vercel + Neon, dominio propio, Analytics, sitemap/SEO (metadatos por carrera y fecha — clave

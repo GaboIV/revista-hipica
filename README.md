@@ -55,10 +55,18 @@ webEjemplo/         Capturas y PDFs de la web de referencia (solo consulta)
   acumula histórico propio semana a semana.
 - **Pronósticos:** solo cátedra propia — no se publican pronósticos de terceros.
 
-## Estado
-
 - ✅ Fase 0 — Fundación: scaffold, esquema BD, seed real, build verde.
 - ✅ Fase 1 — MVP visual: portada, programa con tabs, detalle de carrera.
-- ✅ Fase 2 — Ingesta: importador Excel INH, scraper con retrospectos
-  (tabla `Actuacion`), cron martes/miércoles con aviso por correo.
-- ⬜ Fase 3 — Estadísticas y fichas. ⬜ Fase 4 — Admin. ⬜ Fase 5 — Deploy.
+- ✅ Fase 2 — Ingesta: importador Excel INH, scraper con retrospectos (tabla `Actuacion`), cron martes/miércoles con aviso por correo.
+- ✅ Fase 3 — Resultados, estadísticas y panel admin: modelo `Resultado`, panel de administración básico (`/admin`) para cargar resultados manualmente, generación de actuaciones en cascada, vistas de resultados (podios y badges) y página de estadísticas en tiempo real.
+- ✅ Fase 4 — Panel admin avanzado: Ingesta de Excel y ejecución del scraper Jockey desde el panel web, refactorización de lógica compartida a `src/lib/`, y gestión interactiva de ejemplares retirados con actualización dinámica de base de datos y limpieza de resultados/actuaciones.
+- ⬜ Fase 5 — Deploy y dominio: Vercel + Neon, dominio propio, sitemaps, SEO optimizado para búsquedas.
+
+
+## Panel de Administración
+
+Para acceder localmente al panel de administración:
+1. Asegúrate de configurar `ADMIN_SECRET` en tu archivo `.env`. (Por defecto en desarrollo: `admin123`)
+2. Entra a `/admin` y digita la contraseña configurada.
+3. Desde allí podrás gestionar las reuniones y cargar las posiciones de llegada y tiempos de los ganadores de cada carrera.
+

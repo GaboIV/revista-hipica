@@ -56,6 +56,6 @@ webEjemplo/         Capturas y PDFs de la web de referencia (solo consulta)
 ## Estado
 
 - ✅ Fase 0 — Fundación: scaffold, esquema BD, seed real, build verde.
-- ⬜ Fase 1 — MVP visual (programa del día, detalle de carrera).
+- ✅ Fase 1 — MVP visual: portada, programa con tabs, detalle de carrera.
 - ⬜ Fase 2 — Ingesta (importador Excel INH + scraper + cron).
 - ⬜ Fase 3 — Estadísticas y fichas. ⬜ Fase 4 — Admin. ⬜ Fase 5 — Deploy.

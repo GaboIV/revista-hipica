@@ -133,9 +133,11 @@ INH por `dataScrapping/extract_xlsx.py` → 15 carreras, 152 inscritos, 46 jinet
 57 entrenadores. Portada provisional consultando la BD. Build verde. Git inicializado.
 Guías: `README.md` (local) y `SETUP.md` (repo GitHub, Neon, Vercel).
 
-### Fase 1 — MVP visual (2–4 sesiones)
-Portada, programa del día (tabs: Carreras, Compromisos, Inscritos, Favoritos), detalle de
-carrera con retrospectos. Todo contra la BD sembrada. Responsive + dark mode.
+### Fase 1 — MVP visual ✅ (completada 17-jul-2026)
+Portada con selector de reuniones, programa del día (tabs: Carreras, Inscritos, Compromisos),
+detalle de carrera con retrospecto por ejemplar (vacío hasta Fase 2). Identidad
+vinotinto/dorado + Playfair Display, dark mode, gualdrapas de colores, slots de publicidad.
+El tab Favoritos se sustituirá por la cátedra propia cuando exista.
 
 ### Fase 2 — Ingesta de datos (2–3 sesiones)
 1. `import-inh-xlsx.ts`: sube el Excel oficial → crea Reunión/Carreras/Inscripciones.

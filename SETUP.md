@@ -17,7 +17,7 @@ El proyecto ya tiene git inicializado y un commit inicial. Solo falta conectarlo
 4. Copia la URL del repo y en la carpeta del proyecto ejecuta:
 
 ```bash
-git remote add origin https://github.com/TU_USUARIO/revista-hipica.git
+git remote add origin https://github.com/GaboIV/revista-hipica.git
 git push -u origin main
 ```
 
@@ -34,7 +34,7 @@ git push -u origin main
 ## 2. Clonar en otra máquina (o si alguien más colabora)
 
 ```bash
-git clone https://github.com/TU_USUARIO/revista-hipica.git
+git clone https://github.com/GaboIV/revista-hipica.git
 cd revista-hipica
 npm install
 cp .env.example .env

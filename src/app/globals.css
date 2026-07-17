@@ -1,26 +1,91 @@
 @import "tailwindcss";
 
+/* ── Identidad: vinotinto + dorado sobre neutros ─────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf8f5;
+  --foreground: #1c1917;
+  --surface: #ffffff;
+  --surface-2: #f3efe9;
+  --border: #e5dfd5;
+  --muted: #78716c;
+
+  --vino: #6b1f2e;
+  --vino-strong: #55182490;
+  --vino-deep: #4a1520;
+  --vino-soft: #f6e9ec;
+  --oro: #b8860b;
+  --oro-bright: #d4a017;
+  --oro-soft: #faf3df;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-borde: var(--border);
+  --color-muted: var(--muted);
+  --color-vino: var(--vino);
+  --color-vino-deep: var(--vino-deep);
+  --color-vino-soft: var(--vino-soft);
+  --color-oro: var(--oro);
+  --color-oro-bright: var(--oro-bright);
+  --color-oro-soft: var(--oro-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-playfair);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #131110;
+    --foreground: #eae6e1;
+    --surface: #1c1917;
+    --surface-2: #262220;
+    --border: #37312d;
+    --muted: #a39e98;
+
+    --vino: #8b2f42;
+    --vino-deep: #a83b52;
+    --vino-soft: #2b1a1e;
+    --oro: #d4a017;
+    --oro-bright: #e4b52e;
+    --oro-soft: #2a2416;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
+
+/* Gualdrapas: colores estándar de mantas por número (1–15) */
+.gualdrapa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.375rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.gualdrapa[data-n="1"]  { background: #d92b2b; color: #fff; }
+.gualdrapa[data-n="2"]  { background: #f5f5f5; color: #111; border: 1px solid #ccc; }
+.gualdrapa[data-n="3"]  { background: #1f4fd8; color: #fff; }
+.gualdrapa[data-n="4"]  { background: #f2c200; color: #111; }
+.gualdrapa[data-n="5"]  { background: #14803c; color: #fff; }
+.gualdrapa[data-n="6"]  { background: #17171b; color: #ffd400; }
+.gualdrapa[data-n="7"]  { background: #f07800; color: #111; }
+.gualdrapa[data-n="8"]  { background: #f4a6c8; color: #111; }
+.gualdrapa[data-n="9"]  { background: #26bfb0; color: #111; }
+.gualdrapa[data-n="10"] { background: #6a2ca0; color: #fff; }
+.gualdrapa[data-n="11"] { background: #9aa2ab; color: #7a1010; }
+.gualdrapa[data-n="12"] { background: #9acd32; color: #14320a; }
+.gualdrapa[data-n="13"] { background: #6b4a2b; color: #fff; }
+.gualdrapa[data-n="14"] { background: #7a1e3c; color: #ffd400; }
+.gualdrapa[data-n="15"] { background: #c8b98a; color: #111; }
+.gualdrapa[data-n="16"] { background: #274b5e; color: #fff; }

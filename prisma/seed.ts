@@ -1,5 +1,5 @@
 // Seed de Fase 0: carga la Reunión 28 (19-jul-2026) extraída del Excel oficial del INH.
-// Fuente: prisma/seed-data/reunion-2026-07-19.json (generado por dataScrapping/extract_xlsx.py)
+// Optimizado para despliegues en la nube: conexión directa sin adapter pg y agrupamiento de inserciones.
 import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -43,13 +43,12 @@ type ReunionJson = {
 function slugify(s: string): string {
   return s
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 }
 
-// "LXVIII PRENSA HÍPICA NACIONAL (GI). SEGUNDO PASO..." → { nombre, grado }
 function detectarClasico(condicion: string | null): { nombre: string | null; grado: string | null } {
   if (!condicion) return { nombre: null, grado: null };
   const m = condicion.match(/^(.*?\(G\s?(I{1,3}|IV|V)\))/i);
@@ -62,6 +61,8 @@ async function main() {
   const data: ReunionJson = JSON.parse(
     readFileSync(join(__dirname, "seed-data", "reunion-2026-07-19.json"), "utf-8"),
   );
+
+  console.log("Iniciando sembrado de datos...");
 
   const hipodromo = await prisma.hipodromo.upsert({
     where: { nombre: "La Rinconada" },
@@ -78,6 +79,67 @@ async function main() {
       nroReunion: data.nroReunion,
     },
   });
+
+  console.log(`Reunión creada. Insertando jinetes, entrenadores y ejemplares en lote...`);
+
+  // Extraer todos los elementos únicos para optimizar las peticiones
+  const ejemplaresSet = new Set<string>();
+  const jinetesSet = new Set<string>();
+  const entrenadoresSet = new Set<string>();
+
+  for (const c of data.carreras) {
+    for (const i of c.inscritos) {
+      ejemplaresSet.add(i.ejemplar);
+      if (i.jinete) jinetesSet.add(i.jinete);
+      if (i.entrenador) entrenadoresSet.add(i.entrenador);
+    }
+  }
+
+  // Insertar Ejemplares en lote
+  await Promise.all(
+    [...ejemplaresSet].map((nombre) =>
+      prisma.ejemplar.upsert({
+        where: { nombre },
+        update: {},
+        create: { nombre, slug: slugify(nombre) },
+      })
+    )
+  );
+
+  // Insertar Jinetes en lote
+  await Promise.all(
+    [...jinetesSet].map((nombre) =>
+      prisma.jinete.upsert({
+        where: { nombre },
+        update: {},
+        create: { nombre, slug: slugify(nombre) },
+      })
+    )
+  );
+
+  // Insertar Entrenadores en lote
+  await Promise.all(
+    [...entrenadoresSet].map((nombre) =>
+      prisma.entrenador.upsert({
+        where: { nombre },
+        update: {},
+        create: { nombre, slug: slugify(nombre) },
+      })
+    )
+  );
+
+  console.log("Actores insertados. Insertando carreras e inscripciones...");
+
+  // Mapear actores para obtener IDs rápidamente
+  const [ejemplaresDb, jinetesDb, entrenadoresDb] = await Promise.all([
+    prisma.ejemplar.findMany(),
+    prisma.jinete.findMany(),
+    prisma.entrenador.findMany(),
+  ]);
+
+  const ejemplaresMap = new Map(ejemplaresDb.map((e) => [e.nombre, e.id]));
+  const jinetesMap = new Map(jinetesDb.map((j) => [j.nombre, j.id]));
+  const entrenadoresMap = new Map(entrenadoresDb.map((e) => [e.nombre, e.id]));
 
   for (const c of data.carreras) {
     const clasico = detectarClasico(c.condicion);
@@ -100,36 +162,18 @@ async function main() {
     });
 
     for (const i of c.inscritos) {
-      const ejemplar = await prisma.ejemplar.upsert({
-        where: { nombre: i.ejemplar },
-        update: {},
-        create: { nombre: i.ejemplar, slug: slugify(i.ejemplar) },
-      });
-
-      const jinete = i.jinete
-        ? await prisma.jinete.upsert({
-            where: { nombre: i.jinete },
-            update: {},
-            create: { nombre: i.jinete, slug: slugify(i.jinete) },
-          })
-        : null;
-
-      const entrenador = i.entrenador
-        ? await prisma.entrenador.upsert({
-            where: { nombre: i.entrenador },
-            update: {},
-            create: { nombre: i.entrenador, slug: slugify(i.entrenador) },
-          })
-        : null;
+      const ejemplarId = ejemplaresMap.get(i.ejemplar)!;
+      const jineteId = i.jinete ? jinetesMap.get(i.jinete) || null : null;
+      const entrenadorId = i.entrenador ? entrenadoresMap.get(i.entrenador) || null : null;
 
       await prisma.inscripcion.upsert({
         where: { carreraId_nroPuesto: { carreraId: carrera.id, nroPuesto: i.nroPuesto } },
         update: {},
         create: {
           carreraId: carrera.id,
-          ejemplarId: ejemplar.id,
-          jineteId: jinete?.id,
-          entrenadorId: entrenador?.id,
+          ejemplarId,
+          jineteId,
+          entrenadorId,
           nroPuesto: i.nroPuesto,
           pp: i.pp,
           kilos: i.kilos,
@@ -154,7 +198,10 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error("Error al sembrar:", e);
     process.exit(1);
   })
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    await prisma.$disconnect();
+    process.exit(0); // Forzar la salida de node para evitar que quede colgado el socket
+  });

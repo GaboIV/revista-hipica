@@ -172,9 +172,12 @@ estadísticas históricas 2023+, cuerpos/dividendos en resultados.
 - **Gestión de Retirados Interactiva**: Componente `CarreraAdminCard` y endpoint `/api/admin/inscripcion/[id]/retirar` que permiten marcar/desmarcar ejemplares como retirados dinámicamente con actualización instantánea de la base de datos y limpieza de resultados/actuaciones obsoletas.
 
 
-### Fase 5 — Deploy y dominio
-Vercel + Neon, dominio propio, Analytics, sitemap/SEO (metadatos por carrera y fecha — clave
-para captar búsquedas "programa la rinconada domingo").
+### Fase 5 — Deploy y dominio ✅ (completada 17-jul-2026)
+- **Sitemap Dinámico (`/sitemap.xml`)**: Generación automática de rutas para portada, estadísticas, estadísticas por año, y todas las reuniones y carreras consultando dinámicamente a la base de datos de Prisma.
+- **Archivo de Robots (`/robots.txt`)**: Indicador de sitemap para rastreadores y exclusión de directorios de administración `/admin/*` y endpoints de API del admin.
+- **Optimización SEO**: Enriquecimiento de `generateMetadata` en las páginas de programa y carrera con títulos y descripciones ricas (número de reunión, nombres de inscritos, clásicos y distancias) para aumentar el CTR en Google.
+- **Paso a paso de Despliegue**: Documentación detallada del proceso de despliegue en Vercel + Neon con sincronización de secretos en GitHub Actions (en `SETUP.md` e `implementation_plan.md`).
+
 
 ### Futuro (mencionado, no detallado)
 - **Revista:** sección de artículos con mini-CMS (tabla `Articulo` ya prevista); edición semanal.

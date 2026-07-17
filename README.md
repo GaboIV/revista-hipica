@@ -60,7 +60,8 @@ webEjemplo/         Capturas y PDFs de la web de referencia (solo consulta)
 - ✅ Fase 2 — Ingesta: importador Excel INH, scraper con retrospectos (tabla `Actuacion`), cron martes/miércoles con aviso por correo.
 - ✅ Fase 3 — Resultados, estadísticas y panel admin: modelo `Resultado`, panel de administración básico (`/admin`) para cargar resultados manualmente, generación de actuaciones en cascada, vistas de resultados (podios y badges) y página de estadísticas en tiempo real.
 - ✅ Fase 4 — Panel admin avanzado: Ingesta de Excel y ejecución del scraper Jockey desde el panel web, refactorización de lógica compartida a `src/lib/`, y gestión interactiva de ejemplares retirados con actualización dinámica de base de datos y limpieza de resultados/actuaciones.
-- ⬜ Fase 5 — Deploy y dominio: Vercel + Neon, dominio propio, sitemaps, SEO optimizado para búsquedas.
+- ✅ Fase 5 — Deploy y dominio: sitemaps y robots.txt dinámicos, SEO optimizado para programas y carreras, y guía paso a paso de deploy en Vercel + Neon con sincronización de secretos en GitHub Actions.
+
 
 
 ## Panel de Administración

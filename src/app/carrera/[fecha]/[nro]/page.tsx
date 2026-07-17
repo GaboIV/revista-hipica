@@ -24,7 +24,40 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { fecha, nro } = await params;
-  return { title: `Carrera ${nro} · ${fecha} — La Rinconada` };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha) || !/^\d+$/.test(nro)) {
+    return { title: "Detalle de Carrera" };
+  }
+
+  const reunion = await prisma.reunion.findFirst({
+    where: { fecha: new Date(fecha) },
+    include: {
+      carreras: {
+        where: { nroCarrera: Number(nro) },
+        include: {
+          inscripciones: {
+            include: { ejemplar: true },
+          },
+        },
+      },
+      hipodromo: true,
+    },
+  });
+
+  const carrera = reunion?.carreras[0];
+
+  if (!reunion || !carrera) {
+    return { title: `Carrera ${nro} · ${fecha} — La Rinconada` };
+  }
+
+  const fLarga = fechaLarga(reunion.fecha);
+  const nShort = nombreCortoCarrera(carrera.condicion, carrera.nombreClasico);
+  const clasico = carrera.nombreClasico ? ` · ${carrera.nombreClasico}` : "";
+  const inscritos = carrera.inscripciones.map((i) => nombreEjemplar(i.ejemplar.nombre)).join(", ");
+
+  return {
+    title: `Carrera ${carrera.nroCarrera} · ${nShort} (${carrera.distancia}m) · ${fLarga} — ${reunion.hipodromo.nombre}`,
+    description: `Detalles e inscritos de la Carrera ${carrera.nroCarrera}${clasico} del ${fLarga} en ${reunion.hipodromo.nombre}. Distancia: ${carrera.distancia}m, superficie: ${carrera.superficie}. Ejemplares: ${inscritos.slice(0, 160)}... Consulta retrospectos completos.`,
+  };
 }
 
 export default async function CarreraPage({ params }: { params: Promise<Params> }) {

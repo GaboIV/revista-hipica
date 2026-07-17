@@ -25,7 +25,33 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { fecha } = await params;
-  return { title: `Programa ${fecha} — La Rinconada` };
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { title: "Programa Oficial" };
+
+  const reunion = await prisma.reunion.findFirst({
+    where: { fecha: new Date(fecha) },
+    include: {
+      hipodromo: true,
+      carreras: {
+        select: {
+          id: true,
+          inscripciones: { select: { id: true } }
+        }
+      }
+    },
+  });
+
+  if (!reunion) {
+    return { title: `Programa ${fecha} · La Rinconada` };
+  }
+
+  const fLarga = fechaLarga(reunion.fecha);
+  const totalCarreras = reunion.carreras.length;
+  const totalInscritos = reunion.carreras.reduce((acc, c) => acc + c.inscripciones.length, 0);
+
+  return {
+    title: `Programa Oficial · Reunión ${reunion.nroReunion} (${fLarga}) — ${reunion.hipodromo.nombre}`,
+    description: `Programación oficial para la Reunión ${reunion.nroReunion} en ${reunion.hipodromo.nombre} (${fLarga}). Consulta las ${totalCarreras} carreras, ${totalInscritos} ejemplares inscritos, retrospectos de actuaciones, compromisos y resultados.`,
+  };
 }
 
 async function cargarReunion(fecha: string) {

@@ -1,5 +1,6 @@
 -- DropIndex
-DROP INDEX "Actuacion_ejemplarId_fecha_key";
+ALTER TABLE "Actuacion" DROP CONSTRAINT IF EXISTS "Actuacion_ejemplarId_fecha_key";
+DROP INDEX IF EXISTS "Actuacion_ejemplarId_fecha_key";
 
 -- AlterTable
 ALTER TABLE "Actuacion" ADD COLUMN     "carreraId" INTEGER;
